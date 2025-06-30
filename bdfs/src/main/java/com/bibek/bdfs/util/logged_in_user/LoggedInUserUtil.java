@@ -1,7 +1,7 @@
 package com.bibek.bdfs.util.logged_in_user;
 
 import com.bibek.bdfs.user.entity.User;
-import com.bibek.bdfs.user.repository.UserInfoRepository;
+import com.bibek.bdfs.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -13,14 +13,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LoggedInUserUtil {
 
-    private final UserInfoRepository userInfoRepository;
+    private final UserRepository userRepository;
 
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String username = getUsername(authentication);
 
-            return userInfoRepository.findByEmailId(username)
+            return userRepository.findByEmailId(username)
                     .orElseThrow(() -> new EntityNotFoundException("No user found with username: " + username));
         }
         throw new IllegalStateException("No authenticated user found in SecurityContext");

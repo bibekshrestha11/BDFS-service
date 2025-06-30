@@ -1,7 +1,7 @@
 package com.bibek.bdfs.security.jwt_auth;
 
 import com.bibek.bdfs.config.user.UserInfoConfig;
-import com.bibek.bdfs.user.repository.UserInfoRepository;
+import com.bibek.bdfs.user.repository.UserRepository;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +15,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenUtils {
 
-    private final UserInfoRepository userInfoRepository;
+    private final UserRepository userRepository;
 
     public String getUserName(JWTClaimsSet claims) {
         return claims.getSubject();
@@ -34,7 +34,7 @@ public class JwtTokenUtils {
     }
 
     public UserDetails userDetails(String emailId) {
-        return userInfoRepository
+        return userRepository
                 .findByEmailId(emailId)
                 .map(UserInfoConfig::new)
                 .orElseThrow(() -> new UsernameNotFoundException("UserEmail: " + emailId + " does not exist"));

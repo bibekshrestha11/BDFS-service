@@ -1,7 +1,5 @@
-package com.bibek.bdfs.auth.dto.response;
+package com.bibek.bdfs.user.dto.response;
 
-
-import com.bibek.bdfs.user.dto.response.RolesResponse;
 import com.bibek.bdfs.user.entity.BloodGroup;
 import com.bibek.bdfs.user.entity.User;
 import com.bibek.bdfs.util.file.FileUrlUtil;
@@ -13,10 +11,10 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class UserRegistrationResponse {
+public class UserResponse {
     Long id;
     String fullName;
     String userEmail;
@@ -28,8 +26,9 @@ public class UserRegistrationResponse {
     String location;
     Double latitude;
     Double longitude;
+    boolean active;
 
-    public UserRegistrationResponse(User user) {
+    public UserResponse(User user) {
         this.id = user.getId();
         this.fullName = user.getFullName();
         this.userEmail = user.getEmailId();
@@ -43,5 +42,6 @@ public class UserRegistrationResponse {
         this.location = user.getLocation();
         this.latitude = user.getLatitude();
         this.longitude = user.getLongitude();
+        this.active = user.isActive();
     }
 }
