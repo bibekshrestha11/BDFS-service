@@ -45,10 +45,12 @@ public class User extends Auditable {
 
     private double longitude;
 
+    private String location;
+
     @Enumerated(EnumType.STRING)
     private BloodGroup bloodGroup;
 
-    @Column(nullable = false, name = "is_verified")
+    @Column(nullable = false)
     private boolean isVerified = true;
 
     @Column(nullable = false, name = "is_active")

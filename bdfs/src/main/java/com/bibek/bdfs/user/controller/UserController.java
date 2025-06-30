@@ -1,40 +1,46 @@
 package com.bibek.bdfs.user.controller;
 
-import com.bibek.bdfs.auth.dto.request.UserRegistrationRequest;
-import com.bibek.bdfs.auth.dto.response.UserRegistrationResponse;
 import com.bibek.bdfs.common.BaseController;
 import com.bibek.bdfs.response.ApiResponse;
-import com.bibek.bdfs.user.messages.UserSwaggerDocumentationMessage;
+import com.bibek.bdfs.user.dto.request.UserUpdateRequest;
+import com.bibek.bdfs.user.dto.response.UserResponse;
 import com.bibek.bdfs.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.bibek.bdfs.user.messages.UserAPIConstants.API_USER;
-
 
 @RestController
 @RequestMapping(API_USER)
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User", description = "User management APIs")
 public class UserController extends BaseController {
 
-    private static final String USER = "User";
     private final UserService userService;
 
     @Operation(
-            summary = UserSwaggerDocumentationMessage.ADD_USER_SUMMARY,
-            description = UserSwaggerDocumentationMessage.ADD_USER_DESCRIPTION
+            summary = "Update logged-in user profile",
+            description = "Updates the profile of the currently logged-in user."
     )
-    @PostMapping()
-    public ResponseEntity<ApiResponse<UserRegistrationResponse>> addUser(@RequestBody UserRegistrationRequest userRequest){
-//        return successResponse(userService.registerSchoolUser(userRequest), ResponseMessageUtil.createdSuccessfully(USER));
-        return null;
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(@ModelAttribute UserUpdateRequest updateRequest) {
+        UserResponse updatedUser = userService.updateUser(updateRequest);
+        return successResponse(updatedUser, "User profile updated successfully");
     }
 
+    @Operation(
+            summary = "Get all verified users",
+            description = "Returns a paginated list of all verified users."
+    )
+    @GetMapping
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(Pageable pageable) {
+        return successResponse(userService.getAllUsers(pageable), "Fetched all verified users successfully");
+    }
 }

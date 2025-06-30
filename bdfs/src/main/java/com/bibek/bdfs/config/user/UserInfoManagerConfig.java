@@ -1,6 +1,6 @@
 package com.bibek.bdfs.config.user;
 
-import com.bibek.bdfs.user.repository.UserInfoRepository;
+import com.bibek.bdfs.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserInfoManagerConfig implements UserDetailsService {
 
-    private final UserInfoRepository userInfoRepo;
+    private final UserRepository userInfoRepo;
     @Override
     public UserDetails loadUserByUsername(String emailId) throws UsernameNotFoundException {
         return userInfoRepo

@@ -16,7 +16,7 @@ import com.bibek.bdfs.auth.service.AuthService;
 import com.bibek.bdfs.security.jwt_auth.JwtTokenGenerator;
 import com.bibek.bdfs.user.dto.response.RolesResponse;
 import com.bibek.bdfs.user.entity.User;
-import com.bibek.bdfs.user.repository.UserInfoRepository;
+import com.bibek.bdfs.user.repository.UserRepository;
 import com.bibek.bdfs.user.role.entity.Roles;
 import com.bibek.bdfs.user.role.entity.UserRole;
 import com.bibek.bdfs.user.role.repository.RolesRepository;
@@ -49,7 +49,7 @@ import java.util.Objects;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    private final UserInfoRepository userInfoRepository;
+    private final UserRepository userRepository;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepo refreshTokenRepo;
     private final AuthenticationManager authenticationManager;
@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
             );
 
             // Fetch user information after successful authentication
-            var userInfoEntity = userInfoRepository.findByEmailId(authenticationRequest.email())
+            var userInfoEntity = userRepository.findByEmailId(authenticationRequest.email())
                     .orElseThrow(() -> {
                         log.error(AuthLogMessages.USER_NOT_FOUND, authenticationRequest.email());
                         return new ResponseStatusException(HttpStatus.NOT_FOUND, "USER NOT FOUND");                    });
@@ -160,7 +160,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ForgotPasswordResponse forgotPassword(String email) {
-        User user = userInfoRepository.findByEmailId(email)
+        User user = userRepository.findByEmailId(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, AuthExceptionMessages.USER_NOT_FOUND + email));
 
         return new ForgotPasswordResponse(AuthResponseMessages.PASSWORD_RESET_LINK_SENT, user.getEmailId(), LocalDateTime.now());
@@ -170,7 +170,7 @@ public class AuthServiceImpl implements AuthService {
     public String resetPassword(ResetPasswordRequest resetPasswordRequest) {
         User user = new User();
         user.setPassword(new BCryptPasswordEncoder().encode(resetPasswordRequest.getNewPassword()));
-        userInfoRepository.save(user);
+        userRepository.save(user);
         return AuthResponseMessages.PASSWORD_RESET_SUCCESS;
     }
 
@@ -188,6 +188,14 @@ public class AuthServiceImpl implements AuthService {
         user.setEmailId(registration.userEmail());
         user.setPhoneNumber(registration.phone());
         user.setPassword(new BCryptPasswordEncoder().encode(registration.password()));
+        Roles role = rolesRepository.findByName(UserRole.USER.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+        user.setRoles(List.of(role));
+        user.setBirthDate(registration.birthDate());
+        user.setBloodGroup(registration.bloodGroup());
+        user.setLocation(registration.location());
+        user.setLatitude(registration.latitude());
+        user.setLongitude(registration.longitude());
+        user.setVerified(true);
         if (registration.profileImage() == null || registration.profileImage().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile image is required");
         }
@@ -196,17 +204,10 @@ public class AuthServiceImpl implements AuthService {
         if (fileType == FileType.IMAGE) {
             String fileName = fileHandlerUtil.saveFile(registration.profileImage(), registration.userEmail()).getFileDownloadUri();
             user.setProfileImage(fileName);
-            Roles role = rolesRepository.findByName(UserRole.USER.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
-            user.setRoles(List.of(role));
-            user.setBirthDate(registration.birthDate());
-            user.setBloodGroup(registration.bloodGroup());
-            user.setLatitude(registration.latitude());
-            user.setLongitude(registration.longitude());
-            user.setVerified(true);
-            userInfoRepository.save(user);
+            userRepository.save(user);
             return new UserRegistrationResponse(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type");
-
     }
 }
