@@ -5,6 +5,7 @@ import com.bibek.bdfs.blood_request.dto.BloodResponse;
 import com.bibek.bdfs.blood_request.entity.BloodRequestEntity;
 import com.bibek.bdfs.blood_request.entity.UrgencyLevel;
 import com.bibek.bdfs.blood_request.repository.BloodRequestRepository;
+import com.bibek.bdfs.knn.KnnService;
 import com.bibek.bdfs.user.entity.BloodGroup;
 import com.bibek.bdfs.user.entity.User;
 import com.bibek.bdfs.util.logged_in_user.LoggedInUserUtil;
@@ -15,12 +16,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BloodRequestServiceImpl implements BloodRequestService{
     private final BloodRequestRepository bloodRequestRepository;
     private final LoggedInUserUtil loggedInUserUtil;
+    private final KnnService knnService;
 
     private static final String BLOOD_REQUEST_NOT_FOUND = "Blood request not found with ID: ";
     @Override
@@ -34,6 +38,13 @@ public class BloodRequestServiceImpl implements BloodRequestService{
         mapFieldsFromDto(bloodRequest, bloodRequestEntity);
 
         bloodRequestRepository.save(bloodRequestEntity);
+
+        log.info("Searching for nearest donors for the blood request: {}", bloodRequestEntity);
+
+        List<User> nearestDonors = knnService.findNearestDonors(bloodRequestEntity);
+
+        log.info("Found {} nearest donors for the blood request", nearestDonors.size());
+
         return new BloodResponse(bloodRequestEntity);
     }
 
