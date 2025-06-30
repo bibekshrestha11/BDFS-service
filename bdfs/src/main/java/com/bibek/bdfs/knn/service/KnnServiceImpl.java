@@ -43,27 +43,34 @@ public class KnnServiceImpl implements KnnService {
 
         // Fetch all eligible donors
         List<User> eligibleDonors = userRepository.findByBloodGroupInAndIsActiveTrue(compatibleGroups);
+        log.info("Fetched {} eligible donors for blood groups: {}", eligibleDonors.size(), compatibleGroups);
 
         double reqLat = request.getLatitude();
         double reqLon = request.getLongitude();
 
-        double radius = 1.0;
+        double radius = 10.0;
         final double MAX_RADIUS = 25.0;
         final double STEP = 0.5;
 
         while (radius <= MAX_RADIUS) {
             double finalRadius = radius;
             List<User> nearbyDonors = eligibleDonors.stream()
-                    .filter(user -> distanceInKm(reqLat, reqLon, user.getLatitude(), user.getLongitude()) <= finalRadius)
+                    .filter(user -> {
+                        double distance = distanceInKm(reqLat, reqLon, user.getLatitude(), user.getLongitude());
+                        log.debug("User: {}, Distance: {} km, Radius: {} km", user.getEmailId(), distance, finalRadius);
+                        return distance <= finalRadius;
+                    })
                     .toList();
 
             if (!nearbyDonors.isEmpty()) {
+                log.info("Found {} nearby donors within {} km radius", nearbyDonors.size(), finalRadius);
                 return nearbyDonors;
             }
 
             radius += STEP;
         }
 
+        log.info("No donors found within {} km radius", MAX_RADIUS);
         return Collections.emptyList(); // No match found within 25km
     }
 
@@ -75,7 +82,9 @@ public class KnnServiceImpl implements KnnService {
                 Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
                         Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return EARTH_RADIUS * c;
+        double distance = EARTH_RADIUS * c;
+        log.debug("Distance between ({}, {}) and ({}, {}) is {} km", lat1, lon1, lat2, lon2, distance);
+        return distance;
     }
 
 

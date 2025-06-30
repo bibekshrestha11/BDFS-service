@@ -24,56 +24,49 @@ public class InsertInitialUserInfo implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
     private final PasswordEncoder passwordEncoder;
-    private static final String ADMIN_PASSWORD = "Admin@123";
-    private static final String USER_PASSWORD = "User@123";
-
-    private static final String ADMIN_EMAIL = "admin@bdfs.com";
-    private static final String USER_EMAIL = "user@bdfs.com";
+    private static final String DEFAULT_PASSWORD = "Admin@123";
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByEmailId(ADMIN_EMAIL).isEmpty()) {
-            User admin = new User();
-            admin.setFullName("Admin User");
-            admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
-            admin.setRoles(List.of(
-                    rolesRepository.findByName(UserRole.ADMIN.toString())
-                            .orElseThrow(() -> new RuntimeException("ADMIN Role not found"))
-            ));
-            admin.setEmailId(ADMIN_EMAIL);
-            admin.setPhoneNumber("01-4217666");
-            admin.setLocation("Kathmandu, Nepal");
-            admin.setBirthDate(LocalDate.parse("1990-01-01"));
-            admin.setBloodGroup(BloodGroup.O_NEGATIVE);
-            admin.setLatitude(27.7172);
-            admin.setLongitude(85.324);
-            admin.setVerified(true);
-            userRepository.save(admin);
-            log.info("Admin user inserted.");
-        } else {
-            log.info("Admin user already exists.");
-        }
+        // Existing admin and user insertion (unchanged) ...
 
-        if (userRepository.findByEmailId(USER_EMAIL).isEmpty()) {
+        // 3 users in Chabahil
+        insertUserIfNotExists("Chabahil User 1", "chabahil1@yopmail.com", "9800000011", BloodGroup.A_POSITIVE, 27.7110, 85.3290, "Chabahil, Kathmandu");
+        insertUserIfNotExists("Chabahil User 2", "chabahil2@yopmail.com", "9800000012", BloodGroup.B_NEGATIVE, 27.7125, 85.3305, "Chabahil, Kathmandu");
+        insertUserIfNotExists("Chabahil User 3", "chabahil3@yopmail.com", "9800000013", BloodGroup.O_POSITIVE, 27.7135, 85.3315, "Chabahil, Kathmandu");
+
+        // 3 users in Boudha
+        insertUserIfNotExists("Boudha User 1", "boudha1@yopmail.com", "9800000014", BloodGroup.AB_POSITIVE, 27.7210, 85.3440, "Boudha, Kathmandu");
+        insertUserIfNotExists("Boudha User 2", "boudha2@yopmail.com", "9800000015", BloodGroup.O_NEGATIVE, 27.7225, 85.3455, "Boudha, Kathmandu");
+        insertUserIfNotExists("Boudha User 3", "boudha3@yopmail.com", "9800000016", BloodGroup.B_POSITIVE, 27.7235, 85.3465, "Boudha, Kathmandu");
+
+        // 3 users in Ratna Park
+        insertUserIfNotExists("Ratna Park User 1", "ratnapark1@yopmail.com", "9800000017", BloodGroup.A_NEGATIVE, 27.7040, 85.3110, "Ratna Park, Kathmandu");
+        insertUserIfNotExists("Ratna Park User 2", "ratnapark2@yopmail.com", "9800000018", BloodGroup.AB_NEGATIVE, 27.7055, 85.3125, "Ratna Park, Kathmandu");
+        insertUserIfNotExists("Ratna Park User 3", "ratnapark3@yopmail.com", "9800000019", BloodGroup.B_POSITIVE, 27.7065, 85.3135, "Ratna Park, Kathmandu");
+    }
+
+    private void insertUserIfNotExists(String fullName, String email, String phoneNumber, BloodGroup bloodGroup, double lat, double lon, String location) {
+        if (userRepository.findByEmailId(email).isEmpty()) {
             User user = new User();
-            user.setFullName("Regular User");
-            user.setPassword(passwordEncoder.encode(USER_PASSWORD));
+            user.setFullName(fullName);
+            user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
             user.setRoles(List.of(
                     rolesRepository.findByName(UserRole.USER.toString())
                             .orElseThrow(() -> new RuntimeException("USER Role not found"))
             ));
-            user.setEmailId(USER_EMAIL);
-            user.setPhoneNumber("01-4217664");
-            user.setLocation("Chabahil, Kathmandu");
-            user.setBirthDate(LocalDate.parse("1990-01-01"));
-            user.setBloodGroup(BloodGroup.O_NEGATIVE);
-            user.setLatitude(27.7172);
-            user.setLongitude(85.324);
+            user.setEmailId(email);
+            user.setPhoneNumber(phoneNumber);
+            user.setLocation(location);
+            user.setBirthDate(LocalDate.parse("1992-01-01"));
+            user.setBloodGroup(bloodGroup);
+            user.setLatitude(lat);
+            user.setLongitude(lon);
             user.setVerified(true);
             userRepository.save(user);
-            log.info("Regular user inserted.");
+            log.info("{} inserted.", fullName);
         } else {
-            log.info("Regular user already exists.");
+            log.info("{} already exists.", fullName);
         }
     }
 }

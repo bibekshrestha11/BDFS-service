@@ -8,6 +8,7 @@ import com.bibek.bdfs.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ public class BloodRequestController extends BaseController {
     private final BloodRequestService bloodRequestService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BloodResponse>> createBloodRequest(BloodRequest bloodRequest) {
+    public ResponseEntity<ApiResponse<BloodResponse>> createBloodRequest(@RequestBody  BloodRequest bloodRequest) {
         return successResponse(bloodRequestService.createBloodRequest(bloodRequest), "Blood request created successfully");
     }
 }
