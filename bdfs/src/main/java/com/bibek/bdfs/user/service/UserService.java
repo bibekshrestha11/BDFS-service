@@ -9,4 +9,6 @@ public interface UserService {
     Page<UserResponse> getAllUsers(Pageable pageable);
 
     UserResponse updateUser(UserUpdateRequest updateRequest);
+
+    UserResponse getLoggedInUser();
 }
