@@ -11,6 +11,7 @@ import com.bibek.bdfs.util.logged_in_user.LoggedInUserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,12 @@ public class UserServiceImplementation implements UserService {
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         log.info("Fetching all users with pagination: {}", pageable);
         Page<User> users = userRepository.findAllByIsVerifiedTrue(pageable);
-        return users.map(UserResponse::new);
+        var filtered = users.getContent().stream()
+                .filter(user -> user.getRoles().stream()
+                        .noneMatch(role -> "ADMIN".equalsIgnoreCase(role.getName())))
+                .map(UserResponse::new)
+                .toList();
+        return new PageImpl<>(filtered, pageable, users.getTotalElements());
     }
 
     @Override
@@ -61,5 +67,15 @@ public class UserServiceImplementation implements UserService {
         User user = loggedInUserUtil.getLoggedInUser();
         log.info("Fetching logged-in user: {}", user.getEmailId());
         return new UserResponse(user);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        log.info("Deleting user with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+        user.setActive(false);
+        userRepository.save(user);
+        log.info("User with ID: {} deleted successfully", id);
     }
 }

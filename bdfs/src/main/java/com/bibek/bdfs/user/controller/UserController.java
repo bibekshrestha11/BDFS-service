@@ -53,4 +53,14 @@ public class UserController extends BaseController {
         UserResponse loggedInUser = userService.getLoggedInUser();
         return successResponse(loggedInUser, "Fetched logged-in user profile successfully");
     }
+
+    @Operation(
+            summary = "Delete user",
+            description = "Deletes the user temporarily."
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return successResponse("User deleted successfully", "User deleted successfully");
+    }
 }
