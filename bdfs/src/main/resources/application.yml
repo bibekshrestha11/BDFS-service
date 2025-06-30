@@ -34,3 +34,8 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /v1/swagger
+
+# Mail Configuration
+google:
+  email: ps9594083@gmail.com
+  password: qbma vtiw gwwc wghx
