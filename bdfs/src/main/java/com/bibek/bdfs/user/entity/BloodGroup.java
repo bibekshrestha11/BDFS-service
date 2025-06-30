@@ -1,6 +1,7 @@
 package com.bibek.bdfs.user.entity;
 
 public enum BloodGroup {
+    ALL("All"),
     A_POSITIVE("A+"),
     A_NEGATIVE("A-"),
     B_POSITIVE("B+"),
