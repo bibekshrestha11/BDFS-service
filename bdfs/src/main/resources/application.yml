@@ -4,6 +4,13 @@ server:
   host: http://localhost
   base-url: ${server.host}:${server.port}/
 
+frontend:
+  port: 4200
+  domain: ${server.host}:${frontend.port}
+  forgot_password: /auth/reset-password
+  verify_email: /auth/verify-email
+
+
 spring:
   application:
     name: bdfs
@@ -17,7 +24,7 @@ spring:
   jpa:
     show_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     defer-datasource-initialization: true
 
 jwt:
@@ -36,6 +43,10 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /v1/swagger
+
+otp:
+  expiryInSeconds: 300 # OTP expiry time in seconds (5 minutes)
+
 
 # Mail Configuration
 google:
