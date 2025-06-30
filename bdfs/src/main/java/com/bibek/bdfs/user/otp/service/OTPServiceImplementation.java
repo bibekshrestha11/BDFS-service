@@ -4,6 +4,7 @@ import com.bibek.bdfs.user.entity.User;
 import com.bibek.bdfs.user.otp.entity.OTP;
 import com.bibek.bdfs.user.otp.entity.OTPPurpose;
 import com.bibek.bdfs.user.otp.repository.OTPRepository;
+import com.bibek.bdfs.util.otp.OtpUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
