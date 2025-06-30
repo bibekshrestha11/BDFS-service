@@ -28,8 +28,8 @@ public class UserServiceImplementation implements UserService {
     @Override
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         log.info("Fetching all users with pagination: {}", pageable);
-        return userRepository.findAllByVerifiedTrue(pageable)
-                .map(UserResponse::new);
+        Page<User> users = userRepository.findAllByIsVerifiedTrue(pageable);
+        return users.map(UserResponse::new);
     }
 
     @Override

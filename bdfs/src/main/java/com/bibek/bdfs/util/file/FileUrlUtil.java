@@ -15,26 +15,17 @@ public class FileUrlUtil {
 
     private static String staticBaseUrl;
 
-    @Value("${server.port}")
-    private int serverPort;
-
-    @Value("${server.base-url:}")
+    @Value("${server.base-url}")
     private String baseUrl;
 
     @PostConstruct
-    private void setBaseUrl() {
-        if (baseUrl == null || baseUrl.isBlank()) {
-            staticBaseUrl = "http://localhost:" + serverPort + "/";
-            log.info("Base URL set to localhost: {}", staticBaseUrl);
-        } else {
-            staticBaseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
-            log.info("Base URL set from property: {}", staticBaseUrl);
-        }
+    public void init() {
+        staticBaseUrl = baseUrl;
     }
 
     public static URI getFileUri(String relativePath) {
         if (relativePath == null || relativePath.isBlank()) {
-            throw new IllegalArgumentException("Relative path cannot be null or empty");
+            return null;
         }
 
         // Normalize and encode the path
@@ -42,7 +33,7 @@ public class FileUrlUtil {
         String encodedPath = URLEncoder.encode(cleanPath, StandardCharsets.UTF_8)
                 .replace("%2F", "/");
 
-        String urlPath = staticBaseUrl + "files/" + encodedPath;
+        String urlPath = staticBaseUrl + "media/" + encodedPath;
         log.debug("Generated URL: {}", urlPath);
         return URI.create(urlPath);
     }

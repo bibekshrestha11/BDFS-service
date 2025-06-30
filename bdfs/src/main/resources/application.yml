@@ -1,6 +1,8 @@
 server:
   port: 8181
   address: 0.0.0.0
+  host: http://localhost
+  base-url: ${server.host}:${server.port}/
 
 spring:
   application:
@@ -15,7 +17,7 @@ spring:
   jpa:
     show_sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     defer-datasource-initialization: true
 
 jwt:
