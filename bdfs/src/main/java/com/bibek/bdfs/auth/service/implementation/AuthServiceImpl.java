@@ -13,9 +13,13 @@ import com.bibek.bdfs.auth.messages.AuthLogMessages;
 import com.bibek.bdfs.auth.messages.AuthResponseMessages;
 import com.bibek.bdfs.auth.repository.RefreshTokenRepo;
 import com.bibek.bdfs.auth.service.AuthService;
+import com.bibek.bdfs.mail.MailService;
 import com.bibek.bdfs.security.jwt_auth.JwtTokenGenerator;
 import com.bibek.bdfs.user.dto.response.RolesResponse;
 import com.bibek.bdfs.user.entity.User;
+import com.bibek.bdfs.user.otp.entity.OTP;
+import com.bibek.bdfs.user.otp.entity.OTPPurpose;
+import com.bibek.bdfs.user.otp.service.OTPService;
 import com.bibek.bdfs.user.repository.UserRepository;
 import com.bibek.bdfs.user.role.entity.Roles;
 import com.bibek.bdfs.user.role.entity.UserRole;
@@ -29,6 +33,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -55,6 +61,15 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final FileHandlerUtil fileHandlerUtil;
     private final RolesRepository rolesRepository;
+    private final OTPService otpService;
+    private final MailService mailService;
+
+    @Value("${frontend.domain}")
+    private String frontEndUrl;
+    @Value("${frontend.forgot_password}")
+    private String forgotPasswordUrl;
+    @Value("${frontend.verify_email}")
+    private String verifyEmailUrl;
 
     @Override
     public AuthResponse getJwtTokensAfterAuthentication(AuthRequest authenticationRequest, HttpServletResponse response) {
@@ -157,23 +172,6 @@ public class AuthServiceImpl implements AuthService {
         return new UsernamePasswordAuthenticationToken(username, password, authorities);
     }
 
-
-    @Override
-    public ForgotPasswordResponse forgotPassword(String email) {
-        User user = userRepository.findByEmailId(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, AuthExceptionMessages.USER_NOT_FOUND + email));
-
-        return new ForgotPasswordResponse(AuthResponseMessages.PASSWORD_RESET_LINK_SENT, user.getEmailId(), LocalDateTime.now());
-    }
-
-    @Override
-    public String resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        User user = new User();
-        user.setPassword(new BCryptPasswordEncoder().encode(resetPasswordRequest.getNewPassword()));
-        userRepository.save(user);
-        return AuthResponseMessages.PASSWORD_RESET_SUCCESS;
-    }
-
     @Override
     @Transactional
     public UserRegistrationResponse registerUser(UserRegistrationRequest registration) {
@@ -210,4 +208,71 @@ public class AuthServiceImpl implements AuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type");
         }
     }
+
+    @Override
+    public String verifyEmail(String email, String token) {
+        if (!EmailValidator.isValid(email)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, AuthExceptionMessages.INVALID_EMAIL);
+        }
+
+        User user = userRepository.findByEmailId(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, AuthExceptionMessages.USER_NOT_FOUND + email));
+
+        if (user.isVerified()) {
+            return AuthResponseMessages.EMAIL_ALREADY_VERIFIED;
+        }
+
+        OTP otp = otpService.getOTP(token, OTPPurpose.REGISTER);
+        if (!otp.getOtpValue().equals(token)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, AuthExceptionMessages.INVALID_OTP);
+        }
+        otpService.validateOTP(user,token, OTPPurpose.REGISTER);
+
+        user.setVerified(true);
+        userRepository.save(user);
+        return AuthResponseMessages.EMAIL_VERIFIED;
+    }
+
+    @Override
+    public UserRegistrationResponse resendVerificationEmail(String email) {
+        if (!EmailValidator.isValid(email)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, AuthExceptionMessages.INVALID_EMAIL);
+        }
+
+        User user = userRepository.findByEmailId(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, AuthExceptionMessages.USER_NOT_FOUND + email));
+
+        if (user.isVerified()) {
+            return new UserRegistrationResponse(user);
+        }
+
+        OTP otp = otpService.saveOTP(user, OTPPurpose.REGISTER);
+        String verifyUrl = this.frontEndUrl + verifyEmailUrl + "?email=" + email;
+        URI frontEndUri = URI.create(verifyUrl);
+        mailService.sendRegistrationMail(user, otp, frontEndUri);
+
+        return new UserRegistrationResponse(userRepository.save(user), otp.getExpiryTime());
+    }
+
+    @Override
+    public ForgotPasswordResponse forgotPassword(String email) {
+        User userEntity = userRepository.findByEmailId(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, AuthExceptionMessages.USER_NOT_FOUND + email));
+        OTP otp = otpService.saveOTP(userEntity, OTPPurpose.FORGOT_PASSWORD);
+        String forgotPasswordLink = frontEndUrl + forgotPasswordUrl + "?token=" + otp.getOtpValue();
+        mailService.sendForgotPasswordMail(userEntity, forgotPasswordLink, otp.getExpiryTime());
+        return new ForgotPasswordResponse(AuthResponseMessages.PASSWORD_RESET_LINK_SENT, userEntity.getEmailId(), otp.getExpiryTime());
+    }
+
+    @Override
+    public String resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        OTP otp = otpService.getOTP(resetPasswordRequest.getOtp(), OTPPurpose.FORGOT_PASSWORD);
+        User userEntity = otp.getUser();
+        userEntity.setPassword(new BCryptPasswordEncoder().encode(resetPasswordRequest.getNewPassword()));
+        userRepository.save(userEntity);
+        return AuthResponseMessages.PASSWORD_RESET_SUCCESS;
+    }
+
+
+
 }

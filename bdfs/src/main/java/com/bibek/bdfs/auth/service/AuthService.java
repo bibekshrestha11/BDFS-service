@@ -16,9 +16,14 @@ public interface AuthService {
 
     AuthResponse getAccessTokenUsingRefreshToken(@CookieValue(name = "refresh_token", required = false) String refreshToken);
 
+    UserRegistrationResponse registerUser(UserRegistrationRequest registration);
+
+    String verifyEmail(String email, String token);
+
+    UserRegistrationResponse resendVerificationEmail(String email);
+
     ForgotPasswordResponse forgotPassword(String email);
 
     String resetPassword(ResetPasswordRequest resetPasswordRequest);
 
-    UserRegistrationResponse registerUser(UserRegistrationRequest registration);
 }
