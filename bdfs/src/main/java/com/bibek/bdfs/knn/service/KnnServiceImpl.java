@@ -1,6 +1,6 @@
 package com.bibek.bdfs.knn.service;
 
-import com.bibek.bdfs.blood_request.entity.BloodRequest;
+import com.bibek.bdfs.blood_request.entity.BloodRequestEntity;
 import com.bibek.bdfs.knn.KnnService;
 import com.bibek.bdfs.user.entity.BloodGroup;
 import com.bibek.bdfs.user.entity.User;
@@ -32,7 +32,7 @@ public class KnnServiceImpl implements KnnService {
     }
 
     @Override
-    public List<User> findNearestDonors(BloodRequest request) {
+    public List<User> findNearestDonors(BloodRequestEntity request) {
         BloodGroup requestedBloodGroup = request.getBloodTypeNeeded();  // enum type
         List<BloodGroup> compatibleGroups = COMPATIBLE_BLOOD_TYPES.getOrDefault(requestedBloodGroup, new ArrayList<>());
 

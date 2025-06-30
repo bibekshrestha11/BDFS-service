@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -28,6 +29,8 @@ public class UserRegistrationResponse {
     String location;
     Double latitude;
     Double longitude;
+    LocalDateTime otpExpiryTime;
+
 
     public UserRegistrationResponse(User user) {
         this.id = user.getId();
@@ -43,5 +46,10 @@ public class UserRegistrationResponse {
         this.location = user.getLocation();
         this.latitude = user.getLatitude();
         this.longitude = user.getLongitude();
+    }
+
+    public UserRegistrationResponse(User user, LocalDateTime otpExpiryTime) {
+        this(user);
+        this.otpExpiryTime = otpExpiryTime;
     }
 }

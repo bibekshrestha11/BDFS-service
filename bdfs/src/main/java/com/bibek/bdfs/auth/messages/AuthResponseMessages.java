@@ -3,6 +3,9 @@ package com.bibek.bdfs.auth.messages;
 public class AuthResponseMessages {
 
     public static final String USER_REGISTERED = "User registered successfully";
+    public static final String EMAIL_VERIFIED = "Email verified successfully";
+    public static final String VERIFICATION_EMAIL_RESENT = "Verification email resent successfully";
+    public static final String EMAIL_ALREADY_VERIFIED = "Email is already verified";
 
     private AuthResponseMessages() {}
     public static final String USER_AUTHENTICATED = "User authenticated successfully";
