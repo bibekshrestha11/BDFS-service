@@ -1,7 +1,7 @@
 package com.bibek.bdfs.config.user;
 
 import com.bibek.bdfs.user.entity.User;
-import com.bibek.bdfs.user.repository.UserInfoRepository;
+import com.bibek.bdfs.user.repository.UserRepository;
 import com.bibek.bdfs.user.role.entity.UserRole;
 import com.bibek.bdfs.user.role.repository.RolesRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,14 @@ import java.util.List;
 @Order(2)
 public class InsertInitialUserInfo implements CommandLineRunner {
 
-    private final UserInfoRepository userInfoRepository;
+    private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
     private final PasswordEncoder passwordEncoder;
     private static final String ADMIN_PASSWORD = "Admin@123";
 
     @Override
     public void run(String... args) {
-        if (userInfoRepository.findByEmailId("admin@bdfs.com").isEmpty()) {
+        if (userRepository.findByEmailId("admin@bdfs.com").isEmpty()) {
             User admin = new User();
             admin.setFullName("Admin User");
             admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
@@ -36,7 +36,7 @@ public class InsertInitialUserInfo implements CommandLineRunner {
             ));
             admin.setEmailId("admin@bdfs.com");
             admin.setVerified(true);
-            userInfoRepository.save(admin);
+            userRepository.save(admin);
             log.info("Admin user inserted.");
         } else {
             log.info("Admin user already exists.");
