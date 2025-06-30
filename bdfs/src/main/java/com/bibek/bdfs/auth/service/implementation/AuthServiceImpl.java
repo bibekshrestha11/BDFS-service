@@ -46,7 +46,6 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -203,6 +202,9 @@ public class AuthServiceImpl implements AuthService {
             String fileName = fileHandlerUtil.saveFile(registration.profileImage(), registration.userEmail()).getFileDownloadUri();
             user.setProfileImage(fileName);
             userRepository.save(user);
+            String verifyUrl = this.frontEndUrl + verifyEmailUrl + "?email=" + registration.userEmail();
+            URI frontEndUri = URI.create(verifyUrl);
+            mailService.sendRegistrationMail(user, otpService.saveOTP(user, OTPPurpose.REGISTER), frontEndUri);
             return new UserRegistrationResponse(user);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type");

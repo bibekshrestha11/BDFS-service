@@ -55,4 +55,11 @@ public class UserServiceImplementation implements UserService {
         User updatedUser = userRepository.save(user);
         return new UserResponse(updatedUser);
     }
+
+    @Override
+    public UserResponse getLoggedInUser() {
+        User user = loggedInUserUtil.getLoggedInUser();
+        log.info("Fetching logged-in user: {}", user.getEmailId());
+        return new UserResponse(user);
+    }
 }

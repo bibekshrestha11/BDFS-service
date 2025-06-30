@@ -43,4 +43,14 @@ public class UserController extends BaseController {
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(Pageable pageable) {
         return successResponse(userService.getAllUsers(pageable), "Fetched all verified users successfully");
     }
+
+    @Operation(
+            summary = "Get logged-in user",
+            description = "Returns the profile of the currently logged-in user."
+    )
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<UserResponse>> getLoggedInUser() {
+        UserResponse loggedInUser = userService.getLoggedInUser();
+        return successResponse(loggedInUser, "Fetched logged-in user profile successfully");
+    }
 }
