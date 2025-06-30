@@ -3,6 +3,7 @@ package com.bibek.bdfs.auth.messages;
 public class AuthExceptionMessages {
     public static final String INVALID_EMAIL = "Invalid email format";
     public static final String INVALID_PHONE = "Invalid phone number format";
+    public static final String INVALID_OTP = "Invalid OTP format";
 
     private AuthExceptionMessages(){}
     public static final String USER_NOT_FOUND = "User not found with email: ";
