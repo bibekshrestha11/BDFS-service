@@ -25,10 +25,14 @@ public class InsertInitialUserInfo implements CommandLineRunner {
     private final RolesRepository rolesRepository;
     private final PasswordEncoder passwordEncoder;
     private static final String ADMIN_PASSWORD = "Admin@123";
+    private static final String USER_PASSWORD = "User@123";
+
+    private static final String ADMIN_EMAIL = "admin@bdfs.com";
+    private static final String USER_EMAIL = "user@bdfs.com";
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByEmailId("admin@bdfs.com").isEmpty()) {
+        if (userRepository.findByEmailId(ADMIN_EMAIL).isEmpty()) {
             User admin = new User();
             admin.setFullName("Admin User");
             admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
@@ -36,7 +40,7 @@ public class InsertInitialUserInfo implements CommandLineRunner {
                     rolesRepository.findByName(UserRole.ADMIN.toString())
                             .orElseThrow(() -> new RuntimeException("ADMIN Role not found"))
             ));
-            admin.setEmailId("admin@bdfs.com");
+            admin.setEmailId(ADMIN_EMAIL);
             admin.setPhoneNumber("01-4217666");
             admin.setLocation("Kathmandu, Nepal");
             admin.setBirthDate(LocalDate.parse("1990-01-01"));
@@ -50,15 +54,15 @@ public class InsertInitialUserInfo implements CommandLineRunner {
             log.info("Admin user already exists.");
         }
 
-        if (userRepository.findByEmailId("user@bdfs.com").isEmpty()) {
+        if (userRepository.findByEmailId(USER_EMAIL).isEmpty()) {
             User user = new User();
             user.setFullName("Regular User");
-            user.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
+            user.setPassword(passwordEncoder.encode(USER_PASSWORD));
             user.setRoles(List.of(
                     rolesRepository.findByName(UserRole.USER.toString())
                             .orElseThrow(() -> new RuntimeException("USER Role not found"))
             ));
-            user.setEmailId("user@bdf.com");
+            user.setEmailId(USER_EMAIL);
             user.setPhoneNumber("01-4217664");
             user.setLocation("Chabahil, Kathmandu");
             user.setBirthDate(LocalDate.parse("1990-01-01"));
