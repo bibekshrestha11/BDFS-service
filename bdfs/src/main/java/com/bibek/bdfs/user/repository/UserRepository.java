@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByEmailId(String emailId);
 
-    Page<User> findAllByVerifiedTrue(Pageable pageable);
+    Page<User> findAllByIsVerifiedTrue(Pageable pageable);
 
     List<User> findByBloodGroupInAndIsActiveTrue(List<BloodGroup> bloodGroups);
 

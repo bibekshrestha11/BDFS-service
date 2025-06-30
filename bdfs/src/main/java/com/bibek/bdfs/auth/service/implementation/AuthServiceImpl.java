@@ -188,6 +188,14 @@ public class AuthServiceImpl implements AuthService {
         user.setEmailId(registration.userEmail());
         user.setPhoneNumber(registration.phone());
         user.setPassword(new BCryptPasswordEncoder().encode(registration.password()));
+        Roles role = rolesRepository.findByName(UserRole.USER.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+        user.setRoles(List.of(role));
+        user.setBirthDate(registration.birthDate());
+        user.setBloodGroup(registration.bloodGroup());
+        user.setLocation(registration.location());
+        user.setLatitude(registration.latitude());
+        user.setLongitude(registration.longitude());
+        user.setVerified(true);
         if (registration.profileImage() == null || registration.profileImage().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile image is required");
         }
@@ -196,13 +204,6 @@ public class AuthServiceImpl implements AuthService {
         if (fileType == FileType.IMAGE) {
             String fileName = fileHandlerUtil.saveFile(registration.profileImage(), registration.userEmail()).getFileDownloadUri();
             user.setProfileImage(fileName);
-            Roles role = rolesRepository.findByName(UserRole.USER.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
-            user.setRoles(List.of(role));
-            user.setBirthDate(registration.birthDate());
-            user.setBloodGroup(registration.bloodGroup());
-            user.setLatitude(registration.latitude());
-            user.setLongitude(registration.longitude());
-            user.setVerified(true);
             userRepository.save(user);
             return new UserRegistrationResponse(user);
         } else {
