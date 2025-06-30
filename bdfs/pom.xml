@@ -8,10 +8,10 @@
 		<version>3.3.4</version>
 		<relativePath/>
 	</parent>
-	<groupId>com.gharbetiba</groupId>
-	<artifactId>gharbetiba</artifactId>
+	<groupId>com.bibek</groupId>
+	<artifactId>bdfs</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gharbetiba</name>
+	<name>bdfs</name>
 	<description>Blood Donor Finder System</description>
 	<properties>
 		<java.version>21</java.version>

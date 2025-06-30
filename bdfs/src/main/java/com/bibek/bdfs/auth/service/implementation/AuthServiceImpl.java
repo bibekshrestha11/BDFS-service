@@ -18,6 +18,7 @@ import com.bibek.bdfs.user.dto.response.RolesResponse;
 import com.bibek.bdfs.user.entity.User;
 import com.bibek.bdfs.user.repository.UserInfoRepository;
 import com.bibek.bdfs.user.role.entity.Roles;
+import com.bibek.bdfs.user.role.entity.UserRole;
 import com.bibek.bdfs.user.role.repository.RolesRepository;
 import com.bibek.bdfs.util.file.FileHandlerUtil;
 import com.bibek.bdfs.util.file.FileType;
@@ -195,9 +196,14 @@ public class AuthServiceImpl implements AuthService {
         if (fileType == FileType.IMAGE) {
             String fileName = fileHandlerUtil.saveFile(registration.profileImage(), registration.userEmail()).getFileDownloadUri();
             user.setProfileImage(fileName);
-            userInfoRepository.save(user);
-            Roles role = rolesRepository.findById(registration.roleId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+            Roles role = rolesRepository.findByName(UserRole.USER.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
             user.setRoles(List.of(role));
+            user.setBirthDate(registration.birthDate());
+            user.setBloodGroup(registration.bloodGroup());
+            user.setLatitude(registration.latitude());
+            user.setLongitude(registration.longitude());
+            user.setVerified(true);
+            userInfoRepository.save(user);
             return new UserRegistrationResponse(user);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type");

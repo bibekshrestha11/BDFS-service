@@ -26,15 +26,15 @@ public class InsertInitialUserInfo implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userInfoRepository.findByEmailId("admin@bibek.bdfs.com").isEmpty()) {
+        if (userInfoRepository.findByEmailId("admin@bdfs.com").isEmpty()) {
             User admin = new User();
             admin.setFullName("Admin User");
             admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
             admin.setRoles(List.of(
                     rolesRepository.findByName(UserRole.ADMIN.toString())
-                            .orElseThrow(() -> new RuntimeException("SUPER ADMIN Role not found"))
+                            .orElseThrow(() -> new RuntimeException("ADMIN Role not found"))
             ));
-            admin.setEmailId("admin@bibek.bdfs.com");
+            admin.setEmailId("admin@bdfs.com");
             admin.setVerified(true);
             userInfoRepository.save(admin);
             log.info("Admin user inserted.");

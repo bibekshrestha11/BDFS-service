@@ -75,7 +75,7 @@ public class AuthController extends BaseController {
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<ForgotPasswordResponse>> forgotPassword(
             @RequestParam
-            @Parameter(description = "Email address of the user", required = true, example = "user@collegehub.com") String email) {
+            @Parameter(description = "Email address of the user", required = true, example = "user@bdfs.com") String email) {
 
         return successResponse(authService.forgotPassword(email),
                 AuthResponseMessages.PASSWORD_RESET_LINK_SENT);
