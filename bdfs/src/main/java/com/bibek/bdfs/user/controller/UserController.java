@@ -41,7 +41,6 @@ public class UserController extends BaseController {
     )
     @GetMapping
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(Pageable pageable) {
-        Page<UserResponse> users = userService.getAllUsers(pageable);
-        return successResponse(users, "Fetched all verified users successfully");
+        return successResponse(userService.getAllUsers(pageable), "Fetched all verified users successfully");
     }
 }

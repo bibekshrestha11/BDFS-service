@@ -50,7 +50,7 @@ public class User extends Auditable {
     @Enumerated(EnumType.STRING)
     private BloodGroup bloodGroup;
 
-    @Column(nullable = false, name = "is_verified")
+    @Column(nullable = false)
     private boolean isVerified = true;
 
     @Column(nullable = false, name = "is_active")
