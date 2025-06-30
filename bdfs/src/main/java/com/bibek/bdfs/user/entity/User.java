@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -38,8 +39,17 @@ public class User extends Auditable {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
+    private LocalDate birthDate;
+
+    private double latitude;
+
+    private double longitude;
+
+    @Enumerated(EnumType.STRING)
+    private BloodGroup bloodGroup;
+
     @Column(nullable = false, name = "is_verified")
-    private boolean isVerified = false;
+    private boolean isVerified = true;
 
     @Column(nullable = false, name = "is_active")
     private boolean isActive = true;

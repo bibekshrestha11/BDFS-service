@@ -19,11 +19,10 @@ public class InitialRolesConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (rolesRepository.count() < 3) {
+        if (rolesRepository.count() < 2) {
             log.info("Roles creation request received");
-            createRoleIfNotExists(UserRole.ADMIN.toString(), "The admin of the application ");
-            createRoleIfNotExists(UserRole.DONOR.toString(), "Blood Donor");
-            createRoleIfNotExists(UserRole.RECEIVER.toString(), "Blood Receiver");
+            createRoleIfNotExists(UserRole.ADMIN.name(), "The admin of the application ");
+            createRoleIfNotExists(UserRole.USER.name(), "The user of the application ");
             log.info("Roles created");
         } else {
             log.info("Roles already exist");
