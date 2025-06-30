@@ -1,29 +1,31 @@
-package com.bibek.bdfs.donor_matches.entity;
+package com.bibek.bdfs.blood_request_donation.entity;
 
 import com.bibek.bdfs.blood_request.entity.BloodRequestEntity;
 import com.bibek.bdfs.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestDonorMatch {
+public class Donation {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id", nullable = false)
-    private BloodRequestEntity bloodRequest;
+    private BloodRequestEntity request;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donor_id", nullable = false)
     private User donor;
 
-    private LocalDateTime notifiedAt;
+    private LocalDateTime donationDate;
 
-    @Enumerated(EnumType.STRING)
-    private ResponseStatus responseStatus = ResponseStatus.PENDING;
+    @Column(nullable = false)
+    private int quantity;
 }
