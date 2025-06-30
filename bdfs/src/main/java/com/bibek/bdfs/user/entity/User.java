@@ -1,6 +1,8 @@
 package com.bibek.bdfs.user.entity;
 
+import com.bibek.bdfs.blood_request.entity.BloodRequestEntity;
 import com.bibek.bdfs.common.Auditable;
+import com.bibek.bdfs.donor_matches.entity.RequestDonorMatch;
 import com.bibek.bdfs.user.role.entity.Roles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
