@@ -15,7 +15,7 @@ spring:
   jpa:
     show_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     defer-datasource-initialization: true
 
 jwt:
@@ -24,9 +24,9 @@ jwt:
 
 app:
   filepath:
-    windows: D:\\college_hub\\
-    linux: /home/user/college_hub/
-    mac: /Users/college_hub/
+    windows: D:\\bdfs\\
+    linux: /home/user/bdfs/
+    mac: /Users/bdfs/
 
 springdoc:
   api-docs:
@@ -34,3 +34,8 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /v1/swagger
+
+# Mail Configuration
+google:
+  email: ps9594083@gmail.com
+  password: qbma vtiw gwwc wghx

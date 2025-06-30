@@ -45,6 +45,8 @@ public class User extends Auditable {
 
     private double longitude;
 
+    private String location;
+
     @Enumerated(EnumType.STRING)
     private BloodGroup bloodGroup;
 

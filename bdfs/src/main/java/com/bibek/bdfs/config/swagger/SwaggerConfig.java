@@ -24,11 +24,11 @@ public class SwaggerConfig {
                         addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
-                .info(new Info().title("College Hub REST API")
-                        .description("Its a API doc for college hub nepal.")
-                        .version("1.0").contact(new Contact().name("CollegeHub")
-                                .email( "info@collegehub.edu.np").url("https://www.collegehub.com.np"))
+                .info(new Info().title("Blood Donor Finder REST API")
+                        .description("Its a API doc for Blood Donor Finder System.")
+                        .version("1.0").contact(new Contact().name("Blood Donor Finder System")
+                                .email( "info@bdfs.com.np").url("https://www.bdfs.com.np"))
                         .license(new License().name("License of API")
-                                .url("https://www.collegehub.com.np/license")));
+                                .url("https://www.bdfs.com.np/license")));
     }
 }
