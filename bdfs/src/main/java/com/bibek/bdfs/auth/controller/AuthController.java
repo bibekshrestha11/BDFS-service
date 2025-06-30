@@ -54,7 +54,6 @@ public class AuthController extends BaseController {
                 AuthResponseMessages.ACCESS_TOKEN_REFRESHED);
     }
 
-    //register
     @Operation(
             summary = "User registration",
             description = "Registers a new user with the provided details."
@@ -68,14 +67,42 @@ public class AuthController extends BaseController {
                 AuthResponseMessages.USER_REGISTERED);
     }
 
+    @PostMapping("/verify-email")
+    @Operation(
+            summary = "Verify email",
+            description = "Verifies the user's email using the provided token and email."
+    )
+    public ResponseEntity<ApiResponse<String>> verifyEmail(
+            @RequestParam
+            @Parameter(description = "Email address of the user", required = true, example = "user@openmichub.com") String email,
+            @RequestParam
+            @Parameter(description = "Verification token sent to the user's email", required = true, example = "123456") String token) {
+        return successResponse(authService.verifyEmail(email, token),
+                AuthResponseMessages.EMAIL_VERIFIED);
+    }
+
+    //resend verification email
+    @Operation(
+            summary = "Resend verification email",
+            description = "Resends the verification email to the user."
+    )
+    @PostMapping("/resend-verification-email")
+    public ResponseEntity<ApiResponse<UserRegistrationResponse>> resendVerificationEmail(
+            @RequestParam
+            @Parameter(description = "User's email address", required = true, example = "user@openmichub.com") String email) {
+        log.info("[AuthController:resendVerificationEmail] Resending verification email to: {}", email);
+        return successResponse(authService.resendVerificationEmail(email),
+                AuthResponseMessages.VERIFICATION_EMAIL_RESENT);
+    }
+
     @Operation(
             summary = "Forgot password",
-            description = "Sends a password reset link to the provided email."
+            description = "Sends a password reset link to the provided recipientEmail."
     )
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<ForgotPasswordResponse>> forgotPassword(
             @RequestParam
-            @Parameter(description = "Email address of the user", required = true, example = "user@bdfs.com") String email) {
+            @Parameter(description = "Email address of the user", required = true, example = "admin@openmichub.com") String email) {
 
         return successResponse(authService.forgotPassword(email),
                 AuthResponseMessages.PASSWORD_RESET_LINK_SENT);
@@ -83,13 +110,15 @@ public class AuthController extends BaseController {
 
     @Operation(
             summary = "Reset password",
-            description = "Resets the user's password using the token received via email."
+            description = "Resets the user's password using the token received via recipientEmail."
     )
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<String>> resetPassword(
             @RequestBody ResetPasswordRequest resetPasswordRequest) {
-
         return successResponse(authService.resetPassword(resetPasswordRequest),
                 AuthResponseMessages.PASSWORD_RESET_SUCCESSFULLY);
     }
+
+
+
 }
