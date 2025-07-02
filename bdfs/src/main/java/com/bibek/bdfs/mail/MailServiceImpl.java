@@ -57,6 +57,20 @@ public class MailServiceImpl implements MailService {
         sendEmail(email, "Verify your email address", content);
     }
 
+    @Override
+    public void bloodRequestNotificationMail(User userEntity, String message, LocalDateTime expiry) {
+        String email = userEntity.getEmailId();
+        String name = userEntity.getFullName();
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("message", message);
+        context.setVariable("expiryTime", expiry.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        context.setVariable("email", email);
+
+        String content = templateEngine.process("blood-request-notification.html", context);
+        sendEmail(email, "New Blood Request Notification", content);
+    }
+
     private void sendEmail(String to, String subject, String content) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();

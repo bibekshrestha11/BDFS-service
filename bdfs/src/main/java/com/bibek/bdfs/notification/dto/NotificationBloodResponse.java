@@ -1,4 +1,4 @@
-package com.bibek.bdfs.blood_request.dto;
+package com.bibek.bdfs.notification.dto;
 
 import com.bibek.bdfs.blood_request.entity.BloodRequestEntity;
 import com.bibek.bdfs.blood_request.entity.BloodRequestStatus;
@@ -8,12 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class BloodResponse {
-    private BloodRequestUserResponse user;
+public class NotificationBloodResponse {
     private BloodGroup bloodTypeNeeded;
     private int quantity;
     private UrgencyLevel urgencyLevel;
@@ -25,10 +23,7 @@ public class BloodResponse {
     private BloodRequestStatus status;
     private LocalDateTime expiresAt;
 
-    private List<RequestDonorMatchResponse> matches;
-    private List<DonationResponse> donations;
-
-    public BloodResponse(BloodRequestEntity bloodRequestEntity){
+    public NotificationBloodResponse(BloodRequestEntity bloodRequestEntity) {
         this.bloodTypeNeeded = bloodRequestEntity.getBloodTypeNeeded();
         this.quantity = bloodRequestEntity.getQuantity();
         this.urgencyLevel = bloodRequestEntity.getUrgencyLevel();
@@ -39,16 +34,5 @@ public class BloodResponse {
         this.additionalNotes = bloodRequestEntity.getAdditionalNotes();
         this.status = bloodRequestEntity.getStatus();
         this.expiresAt = bloodRequestEntity.getExpiresAt();
-        this.user = new BloodRequestUserResponse(bloodRequestEntity.getUser());
-        if (bloodRequestEntity.getMatches() != null) {
-            this.matches = bloodRequestEntity.getMatches().stream()
-                    .map(RequestDonorMatchResponse::new)
-                    .toList();
-        }
-        if (bloodRequestEntity.getDonations() != null) {
-            this.donations = bloodRequestEntity.getDonations().stream()
-                    .map(DonationResponse::new)
-                    .toList();
-        }
     }
 }

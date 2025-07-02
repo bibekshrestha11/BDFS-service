@@ -15,4 +15,7 @@ public interface MailService {
     @Async
     void sendRegistrationMail(User userEntity, OTP otp, URI frontEndUri);
 
+    @Async
+    void bloodRequestNotificationMail(User userEntity, String message, LocalDateTime expiry);
+
 }

@@ -13,13 +13,13 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -27,8 +27,6 @@ public class Notification {
 
     @CreationTimestamp
     private Instant sentAt;
-
-    private boolean read = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private BloodRequestEntity relatedRequest;

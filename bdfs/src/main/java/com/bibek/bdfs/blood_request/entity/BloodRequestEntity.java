@@ -1,6 +1,8 @@
 package com.bibek.bdfs.blood_request.entity;
 
+import com.bibek.bdfs.blood_request_donation.entity.Donation;
 import com.bibek.bdfs.common.Auditable;
+import com.bibek.bdfs.donor_matches.entity.RequestDonorMatch;
 import com.bibek.bdfs.user.entity.BloodGroup;
 import com.bibek.bdfs.user.entity.User;
 import jakarta.persistence.*;
@@ -8,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -33,6 +38,12 @@ public class BloodRequestEntity extends Auditable {
     private String hospitalAddress;
     private String additionalNotes;
     private BloodRequestStatus status;
-    private String expiresAt;
+    private LocalDateTime expiresAt;
 
+    // Relationships
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RequestDonorMatch> matches;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Donation> donations;
 }
