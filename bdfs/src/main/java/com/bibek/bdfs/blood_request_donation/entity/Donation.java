@@ -17,11 +17,9 @@ public class Donation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id", nullable = false)
     private BloodRequestEntity request;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "donor_id", nullable = false)
     private User donor;
 
     private LocalDateTime donationDate;

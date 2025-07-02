@@ -3,19 +3,26 @@ package com.bibek.bdfs.blood_request.service;
 import com.bibek.bdfs.blood_request.dto.BloodRequest;
 import com.bibek.bdfs.blood_request.dto.BloodResponse;
 import com.bibek.bdfs.blood_request.entity.BloodRequestEntity;
+import com.bibek.bdfs.blood_request.entity.BloodRequestStatus;
 import com.bibek.bdfs.blood_request.entity.UrgencyLevel;
 import com.bibek.bdfs.blood_request.repository.BloodRequestRepository;
+import com.bibek.bdfs.donor_matches.entity.RequestDonorMatch;
+import com.bibek.bdfs.donor_matches.entity.ResponseStatus;
+import com.bibek.bdfs.donor_matches.repository.DonorMatchRepository;
 import com.bibek.bdfs.knn.KnnService;
+import com.bibek.bdfs.notification.service.NotificationService;
 import com.bibek.bdfs.user.entity.BloodGroup;
 import com.bibek.bdfs.user.entity.User;
 import com.bibek.bdfs.util.logged_in_user.LoggedInUserUtil;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -25,9 +32,12 @@ public class BloodRequestServiceImpl implements BloodRequestService{
     private final BloodRequestRepository bloodRequestRepository;
     private final LoggedInUserUtil loggedInUserUtil;
     private final KnnService knnService;
+    private final DonorMatchRepository donorMatchRepository;
+    private final NotificationService notificationService;
 
     private static final String BLOOD_REQUEST_NOT_FOUND = "Blood request not found with ID: ";
     @Override
+    @Transactional
     public BloodResponse createBloodRequest(BloodRequest bloodRequest) {
         log.info("Creating blood request: {}", bloodRequest);
 
@@ -37,7 +47,7 @@ public class BloodRequestServiceImpl implements BloodRequestService{
 
         mapFieldsFromDto(bloodRequest, bloodRequestEntity);
 
-        bloodRequestRepository.save(bloodRequestEntity);
+        bloodRequestEntity.setStatus(BloodRequestStatus.OPEN);
 
         log.info("Searching for nearest donors for the blood request: {}", bloodRequestEntity);
 
@@ -45,7 +55,26 @@ public class BloodRequestServiceImpl implements BloodRequestService{
 
         log.info("Found {} nearest donors for the blood request", nearestDonors.size());
 
+        List<RequestDonorMatch> matches = nearestDonors.stream()
+                .map(donor -> createMatch(donor, bloodRequestEntity))
+                .toList();
+        donorMatchRepository.saveAll(matches);
+
+        bloodRequestEntity.setMatches(matches);
+        bloodRequestRepository.save(bloodRequestEntity);
+
+        matches.forEach(notificationService::notifyDonor);
+
         return new BloodResponse(bloodRequestEntity);
+    }
+
+    private RequestDonorMatch createMatch(User donor, BloodRequestEntity request) {
+        return RequestDonorMatch.builder()
+                .bloodRequest(request)
+                .donor(donor)
+                .notifiedAt(LocalDateTime.now())
+                .responseStatus(ResponseStatus.PENDING)
+                .build();
     }
 
     @Override
@@ -70,6 +99,7 @@ public class BloodRequestServiceImpl implements BloodRequestService{
         target.setHospitalName(source.getHospitalName());
         target.setHospitalAddress(source.getHospitalAddress());
         target.setAdditionalNotes(source.getAdditionalNotes());
+        target.setExpiresAt(source.getExpiresAt());
     }
 
     @Override
